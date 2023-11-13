@@ -131,18 +131,13 @@ export default function Home() {
 	const [balloonText,setBalloonText] = useState("");
 	const [buttonNewContract,setbuttonNewContract] = useState(true);
 	const [buttonExistingContract,setbuttonExistingContract] = useState(true);
-  	const [accountAddress, setAccountAddress] = useState(null);
-  	const isConnectedToPeraWallet = !!accountAddress;
   	const router = useRouter();
 
 	useEffect(() => {
 		// Reconnect to the session when the component is mounted
 		peraWallet
 			.reconnectSession()
-			.then((accounts) => {
-				if (peraWallet.isConnected) {
-					setAccountAddress(accounts[0])
-				}
+			.then(() => {
 			
 		})
 		.catch((e) => console.log(e));
@@ -150,15 +145,13 @@ export default function Home() {
 
 	const disconnect = async () => {
 		peraWallet.disconnect();
-		setAccountAddress(null);
 	}
 
   	const login = async () => {
 		peraWallet
 			.connect()
-			.then((newAccounts) => {
+			.then(() => {
 				peraWallet.connector.on("disconnect", disconnect);
-				setAccountAddress(newAccounts[0]);
 			})
 			.catch((error) => {
 			if (error?.data?.type !== "CONNECT_MODAL_CLOSED") {
@@ -181,7 +174,7 @@ export default function Home() {
 	
 		atc.addMethodCall({
 			appID: 469360340,
-			method: algosdk.getMethodByName(contract.methods, 'readFundsWithdrawnStatus'),
+			method: algosdk.getMethodByName(contract.methods, 'readItem'),
 			sender: account,
 			suggestedParams,
 			signer: async (unsignedTxns) => {
@@ -198,16 +191,48 @@ export default function Home() {
 		});
 	
 		try {
-			const results = await atc.execute(algodClient, 3);
-			const active = results.methodResults[0].returnValue
-			if (!active) {
+				const results = await atc.execute(algodClient, 3);
+				const active = results.methodResults[0].returnValue
 				setbuttonExistingContract(false);
 				setbuttonNewContract(true);
-			}
-			else {
-				setBalloonText('Contract is no longer active');
-				setShowBalloon(true);
-			}
+				const seller = active[1]
+				const realtor = active[2]
+				const amount = Number(active[3]) / 1e6;
+
+				var resultdate = new Date(Number(active[4])*1000);
+				var startdate = new Date(resultdate.getTime()+36000000);
+				active[4]=startdate;
+				var startdate = active[4].toLocaleString(undefined, {
+					month: "long",
+					day: "numeric",
+					year: "numeric",
+				});
+
+				var resultdate2 = new Date(Number(active[5])*1000);
+				var sellbydate = new Date(resultdate2.getTime()+36000000);
+				active[5]=sellbydate;
+				var sellbydate = active[5].toLocaleString(undefined, {
+					month: "long",
+					day: "numeric",
+					year: "numeric",
+				});
+
+				var salesPrice = active[8];
+				var activeflag = active[10];
+				console.log(activeflag)
+				if (activeflag){
+					localStorage.setItem("active", "NO")
+				}
+				else {
+					localStorage.setItem("active", "YES")
+				}
+
+				localStorage.setItem("algos", amount)
+				localStorage.setItem("seller", seller)
+				localStorage.setItem("receiver", realtor)
+				localStorage.setItem("startdate", startdate)
+				localStorage.setItem("enddate", sellbydate)
+				localStorage.setItem("salesprice", Number(salesPrice))
 		} catch (e) {
 			console.log(e);
 			setbuttonNewContract(false);
@@ -344,7 +369,7 @@ export default function Home() {
 				  >
 					<img src="/assets/images/newfile.png" alt="New File Image" className="h-12 w-12" />
 				  </button>
-				  <p className="text-default-text">New <span><p>Contract</p></span></p>
+				  <p className="text-default-text">New Contract</p>
 				</div>
 				<div className="w-full sm:w-1/2 text-center m-2">
 				  <button
@@ -354,7 +379,7 @@ export default function Home() {
 				  >
 					<img src="/assets/images/existingfile.png" alt="Existing File Image" className="h-12 w-12" />
 				  </button>
-				  <p className="text-default-text">Existing <span><p>Contract</p></span></p>
+				  <p className="text-default-text">Existing Contract	</p>
 				</div>
 			  </section>
 			  <footer className="flex justify-start pt-5">

@@ -204,10 +204,15 @@ const MyForm = () => {
         ],
     });
     
-		const results = await atc.execute(algodClient, 3);
-		console.log(`Contract created ` + results.methodResults[0].returnValue);
-		setPopupHeaderSuccess('Contract Initiated!');
-		setShowPopupSuccess(true);
+    try {
+      const results = await atc.execute(algodClient, 3);
+      console.log(`Contract created ` + results.methodResults[0].returnValue);
+      setPopupHeaderSuccess('Contract Initiated!');
+      setShowPopupSuccess(true);
+    }
+    catch(e) {
+      console.log(e)
+    }
 	}
 
   async function signer(unsignedTxns) {

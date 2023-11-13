@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import Popup from '@/components/popup';
 import PopupSuccess from '@/components/popupsuccess';
 import { PeraWalletConnect } from "@perawallet/connect";
-import { useSearchParams, useRouter } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import * as algosdk from 'algosdk'
 import axios from "axios"
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -138,7 +138,6 @@ async function callContract(APN, account) {
 	const contract = new algosdk.ABIContract(myabi);
 	const atc = new algosdk.AtomicTransactionComposer();
 
-  console.log(account)
 
 	atc.addMethodCall({
 		appID: 469360340,
@@ -158,10 +157,15 @@ async function callContract(APN, account) {
 		],
 	});
 
-	const results = await atc.execute(algodClient, 3);
-  const resultsArray = results.methodResults[0].returnValue
-  console.log(`Contract read success ` + results.methodResults[0].returnValue);
-	return resultsArray
+  try {
+    const results = await atc.execute(algodClient, 3);
+    const resultsArray = results.methodResults[0].returnValue
+    console.log(`Contract read success ` + results.methodResults[0].returnValue);
+    return resultsArray
+  }
+  catch(e) {
+    console.log(e)
+  }
 }
 
 async function withdrawSenderPera(APN, account) {
@@ -194,10 +198,16 @@ async function withdrawSenderPera(APN, account) {
 		],
 	});
 
-	const results = await atc.execute(algodClient, 3);
-  const resultsArray = results.methodResults[0].returnValue
-  console.log(`Contract read success ` + results.methodResults[0].returnValue);
-	return resultsArray
+	try {
+    const results = await atc.execute(algodClient, 3);
+    const resultsArray = results.methodResults[0].returnValue
+    console.log(`Contract read success ` + results.methodResults[0].returnValue);
+
+    return resultsArray
+  }
+  catch(e) {
+    console.log(e)
+  }
 }
 
 async function withdrawReceiverPera(APN, account) {
@@ -205,10 +215,8 @@ async function withdrawReceiverPera(APN, account) {
 	const algodServer = 'https://testnet-api.algonode.cloud';
 	const algodPort = undefined;
 	const algodClient = new algosdk.Algodv2(algodToken, algodServer, algodPort);
-
 	const suggestedParams = await algodClient.getTransactionParams().do();
-  	console.log('suggestedParams:', suggestedParams);
-
+  console.log('suggestedParams:', suggestedParams);
 	const contract = new algosdk.ABIContract(myabi);
 	const atc = new algosdk.AtomicTransactionComposer();
 
@@ -230,10 +238,15 @@ async function withdrawReceiverPera(APN, account) {
 		],
 	});
 
-	const results = await atc.execute(algodClient, 3);
-  const resultsArray = results.methodResults[0].returnValue
-  console.log(`Contract read success ` + results.methodResults[0].returnValue);
-	return resultsArray
+  try {
+    const results = await atc.execute(algodClient, 3);
+    const resultsArray = results.methodResults[0].returnValue
+    console.log(`Contract read success ` + results.methodResults[0].returnValue);
+    return resultsArray
+  }
+  catch(e) {
+    console.log(e)
+  }
 }
 
 
@@ -262,18 +275,25 @@ const MyPage = () => {
   const [accountAddress, setAccountAddress] = useState(null);
 
   const searchParams = useSearchParams()
-  const router = useRouter();
   const APN = searchParams.get('SelAPN');
 	console.log('APN = '+APN);
 	const Address = searchParams.get('Address');
   console.log('Address = '+Address);
+
 
   useEffect(() => {
 		peraWallet
 			.reconnectSession()
 			.then((accounts) => {
 				if (peraWallet.isConnected) {
-					setAccountAddress(accounts[0])
+          setAccountAddress(accounts[0])
+          setSeller(localStorage.getItem("seller"));
+          setRealtor(localStorage.getItem("receiver"));
+          setAmount(localStorage.getItem("algos"));
+          setStartdate(localStorage.getItem("startdate"));
+          setSellbydate(localStorage.getItem("enddate"));
+          setSalesPrice(localStorage.getItem("salesprice"));
+          setActiveFlag(localStorage.getItem("active"));
 				}
 			
 			})
@@ -305,7 +325,7 @@ const MyPage = () => {
         setPopupHeaderSuccess('Withdrawal Initiated. ' + response.data["meetSalesCondition"].reason);
         setShowPopupSuccess(true);
         setFetch(false)
-        router.push('/checkContract');
+        setActiveFlag("NO")
       }
       else {
         setPopupHeader('Unable to withdraw');
@@ -317,6 +337,9 @@ const MyPage = () => {
     .catch(error => {
       // Handle errors
       console.error('Error:', error);
+      setPopupHeader('Something went wrong...');
+      setShowPopup(true);
+      setFetch(false)
     });
   }
   
@@ -344,6 +367,7 @@ const MyPage = () => {
         setPopupHeaderSuccess('Withdrawal Initiated. ' + response.data["meetSalesCondition"].reason);
         setShowPopupSuccess(true);
         setFetch(false)
+        setActiveFlag("NO")
       }
       else {
         setPopupHeader('Unable to withdraw');
@@ -355,11 +379,13 @@ const MyPage = () => {
     .catch(error => {
       // Handle errors
       console.error('Error:', error);
+      setPopupHeader('Something went wrong...');
+      setShowPopup(true);
+      setFetch(false)
     });
   }
 
   const refresh = async () => {
-    console.log(accountAddress)
 		peraWallet
 			.reconnectSession()
 			.then((accounts) => {
@@ -395,6 +421,7 @@ const MyPage = () => {
       setSeller(resultarray[1]);
       setRealtor(resultarray[2]);
       setAmount(Number(resultarray[3]) / 1e6);
+
       var resultdate = new Date(Number(resultarray[4])*1000);
       startdate = new Date(resultdate.getTime()+36000000);
       resultarray[4]=startdate;
@@ -421,10 +448,19 @@ const MyPage = () => {
       var activeflag = resultarray[10];
       if (activeflag){
         setActiveFlag('NO');
+        localStorage.setItem("active", "NO")
       }
       else {
         setActiveFlag('YES');
+        localStorage.setItem("active", "YES")
       }
+
+      localStorage.setItem("algos", Number(resultarray[3]) / 1e6)
+			localStorage.setItem("seller", resultarray[1])
+			localStorage.setItem("receiver", resultarray[2])
+			localStorage.setItem("startdate", startdate)
+			localStorage.setItem("enddate", sellbydate)
+			localStorage.setItem("salesprice", salesPrice)
   }
     
   return (
@@ -439,9 +475,10 @@ const MyPage = () => {
               <button 
                 type="button" 
                 onClick={refresh}
-                className="refresh_btn flex flex-row-reverse hover:bg-[#000000]/90 focus:outline-none focus:ring-[#000000]/60 inline-flex items-center hover:text-[#ffffff] dark:focus:ring-[#000000]/55"
+                className="refresh_btn flex items-center hover:bg-[#000000]/90 focus:outline-none focus:ring-[#000000]/60 inline-flex hover:text-[#ffffff] dark:focus:ring-[#000000]/55"
               >
                 <FontAwesomeIcon icon={faArrowsRotate} style={{ color: "#ffffff" }} className='' />
+                <p className="text-white font-bold ml-2" style={{ paddingLeft: '8px' }}>Refresh</p>
               </button>
             </div>
           </div>
@@ -456,7 +493,7 @@ const MyPage = () => {
           />
           <div className="p-6 rounded border border border-sky-200">
             <div className="flex rounded px-2 py-2">
-              <div className="w-1/2">
+              <div className="w-2/3">
                 <ul className="list-inside text-black">
                   <li>Amount <span className='text-default-text'>(Algos)</span>:</li>
                   <li>Start date:</li>

@@ -28,7 +28,7 @@ const Home = () => (
 				type='button'
 				className='black_btn contract'
 				>
-				Create Contract
+				Create Escrow
 				</button>
 			</Link>
 			</>
