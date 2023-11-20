@@ -129,7 +129,6 @@ const myabi = {
 export default function Home() {
 	const [showBalloon,setShowBalloon] = useState(false);
 	const [balloonText,setBalloonText] = useState("");
-	const [buttonNewContract,setbuttonNewContract] = useState(true);
 	const [buttonExistingContract,setbuttonExistingContract] = useState(true);
   	const router = useRouter();
 
@@ -194,54 +193,52 @@ export default function Home() {
 				const results = await atc.execute(algodClient, 3);
 				const active = results.methodResults[0].returnValue
 				setbuttonExistingContract(false);
-				setbuttonNewContract(true);
 				const seller = active[1]
 				const realtor = active[2]
 				const amount = Number(active[3]) / 1e6;
 
-				var resultdate = new Date(Number(active[4])*1000);
-				var startdate = new Date(resultdate.getTime()+36000000);
-				active[4]=startdate;
-				var startdate = active[4].toLocaleString(undefined, {
-					month: "short",
-					day: "numeric",
-					year: "numeric",
-				});
+				if (active[10]) {
+					var resultdate = new Date(Number(active[4])*1000);
+					var startdate = new Date(resultdate.getTime()+36000000);
+					active[4]=startdate;
+					var startdate = active[4].toLocaleString(undefined, {
+						month: "short",
+						day: "numeric",
+						year: "numeric",
+					});
 
-				var resultdate2 = new Date(Number(active[5])*1000);
-				var sellbydate = new Date(resultdate2.getTime()+36000000);
-				active[5]=sellbydate;
-				var sellbydate = active[5].toLocaleString(undefined, {
-					month: "short",
-					day: "numeric",
-					year: "numeric",
-				});
+					var resultdate2 = new Date(Number(active[5])*1000);
+					var sellbydate = new Date(resultdate2.getTime()+36000000);
+					active[5]=sellbydate;
+					var sellbydate = active[5].toLocaleString(undefined, {
+						month: "short",
+						day: "numeric",
+						year: "numeric",
+					});
 
-				var salesPrice = active[8];
-				var activeflag = active[10];
-				console.log(activeflag)
-				if (activeflag){
-					localStorage.setItem("active", "NO")
+					var salesPrice = active[8];
+					var activeflag = active[10];
+					if (activeflag){
+						localStorage.setItem("active", "NO")
+					}
+					else {
+						localStorage.setItem("active", "YES")
+					}
+
+					localStorage.setItem("algos", amount)
+					localStorage.setItem("seller", seller)
+					localStorage.setItem("receiver", realtor)
+					localStorage.setItem("startdate", startdate)
+					localStorage.setItem("enddate", sellbydate)
+					localStorage.setItem("salesprice", Number(salesPrice))
 				}
-				else {
-					localStorage.setItem("active", "YES")
-				}
-
-				localStorage.setItem("algos", amount)
-				localStorage.setItem("seller", seller)
-				localStorage.setItem("receiver", realtor)
-				localStorage.setItem("startdate", startdate)
-				localStorage.setItem("enddate", sellbydate)
-				localStorage.setItem("salesprice", Number(salesPrice))
 		} catch (e) {
 			console.log(e);
-			setbuttonNewContract(false);
-			setbuttonExistingContract(true);
 		}
 	}
 
 	const handleClickBalloon = () => {
-		setBalloonText('Check the address of the given APN/ID. If there is no active contract on the given APN/ID, you can create a new contract. If there is an active contract, you can check the details of the existing contract.');
+		setBalloonText('Check the address of the given APN. If there is no active contract on the given APN, you can create a new contract. If there is an active contract, you can check the details of the existing contract. ');
 		setShowBalloon(true);
 	}
 
@@ -272,9 +269,7 @@ export default function Home() {
 	};
 
 	const handleNewContract = async() => {
-		var data = document.getElementById("myAPNInput").value;
-		const data2 = document.getElementById("addresscheck").value;
-		router.push(`/newContract?SelAPN=${data}&Address=${data2}`);
+		router.push(`/newContract`);
 	};
 	
 	const checkaddress = async() => {
@@ -306,16 +301,16 @@ export default function Home() {
 				localStorage.setItem("lastSalePrice", lastSalePrice);
 				checkAPN(myAPN);
 			} else {
-				setBalloonText('No property found for the given ID');
+				setBalloonText('No property found for the given ID. You can check if the property exists in https://developers.rentcast.io/reference/property-record-by-id');
 				setShowBalloon(true);
-				console.log('No property found for the given ID');
+				console.log('No property found for the given ID. ');
 			}
 			} catch (error) {
 				console.log('Error fetching property information: ' + error.message);
 			}
 		}
 		else {
-			setBalloonText('Please enter an APN/ID');
+			setBalloonText('Please enter an APN.');
 			setShowBalloon(true);
 		}
 		
@@ -327,6 +322,7 @@ export default function Home() {
 			<div className='flex-col flex-start pt-4 pb-0 contract-left'>
 			  <section className="text-left mb-4">
 				<h1 className="text-xl font-bold m-2">Please Enter Your APN/ID</h1>
+				<h1 className="text-s m-2"> View available existing contract by checking APN/ID</h1>
 			  </section>
 			  <section className="flex mb-8">
 				<input
@@ -363,9 +359,8 @@ export default function Home() {
 			  <section className="flex-start">
 				<div className="w-full sm:w-1/2 text-center mr-10 m-2">
 				  <button
-					className={`hover:bg-gray-200 text-white font-semibold py-3 px-6 rounded-lg mb-4  border border-sky-200 ${buttonNewContract ? 'bg-white cursor-not-allowed' : 'bg-white'}`}
+					className={`hover:bg-gray-200 text-white font-semibold py-3 px-6 rounded-lg mb-4  border border-sky-200 bg-white`}
 					onClick={handleNewContract}
-					disabled={buttonNewContract}
 				  >
 					<img src="/assets/images/newfile.png" alt="New File Image" className="h-12 w-12" />
 				  </button>
