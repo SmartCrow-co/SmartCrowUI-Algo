@@ -299,7 +299,7 @@ const MyPage = () => {
       const results = await atc.execute(algodClient, 3);
       const resultsArray = results.methodResults[0].returnValue
       console.log(`Contract read success ` + results.methodResults[0].returnValue);
-      setPopupHeaderSuccess('Withdrawal Initiated. ' + response.data["meetSalesCondition"].reason + ". View transaction on https://testnet.algoexplorer.io/");
+      setPopupHeaderSuccess('Withdrawal Initiated. ' + reason + ". View transaction on https://testnet.algoexplorer.io/");
       setShowPopupSuccess(true);
       setFetch(false)
       setActiveFlag("NO")

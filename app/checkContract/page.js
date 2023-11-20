@@ -279,6 +279,7 @@ export default function Home() {
 		setFetch(true)
 		if (myAPN != "") {
 			const url = `https://api.rentcast.io/v1/properties/${encodeURIComponent(myAPN)}`;
+			console.log(url)
 
 			try {
 				const response = await _fetch(url, {

@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import Popup from '@/components/popup';
 import PopupSuccess from '@/components/popupsuccess';
 import PopupInfo from '@/components/popupinfo';
@@ -8,6 +8,8 @@ import { PeraWalletConnect } from "@perawallet/connect";
 import * as algosdk from 'algosdk'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCircleInfo } from '@fortawesome/free-solid-svg-icons';
+import dotenv from 'dotenv';
+import _fetch from 'isomorphic-fetch';
 
 const peraWallet = new PeraWalletConnect();
 const myabi = {
@@ -138,7 +140,6 @@ const MyForm = () => {
 	const [balloonText,setBalloonText] = useState("");
 	const [accountAddress, setAccountAddress] = useState(null);
   const [isForSale, setIsForSale] = useState(true);
-  const isConnectedToPeraWallet = !!accountAddress;
 
 	useEffect(() => {
 		// Reconnect to the session when the component is mounted
@@ -303,6 +304,7 @@ const MyForm = () => {
       };
 
 	  const handleChange = async() => {
+      const myAPN = document.getElementById("parcelid").value;
       const verAmount= document.getElementById("bonusamount").value;
       const verStartdate= document.getElementById("startdate").value;
       const verSellbydate= document.getElementById("sellbydate").value;
@@ -310,8 +312,40 @@ const MyForm = () => {
       const verRealtor = document.getElementById("receiverwallet").value;
       const salesPrice = document.getElementById("salesprice").value;
 
+      const myText = document.getElementById("addresscheck");
+      myText.value = "Loading...";
+
+      dotenv.config()
+      const API_KEY = process.env.NEXT_PUBLIC_API_KEY
+      const url = `https://api.rentcast.io/v1/properties/${encodeURIComponent(myAPN)}`;
+
+      try {
+        const response = await _fetch(url, {
+          method: 'GET',
+          headers: {
+            accept: 'application/json',
+            'X-Api-Key': API_KEY,
+          },
+        });
+      
+        if (response.ok) {
+          const json = await response.json();
+          const myText = document.getElementById("addresscheck");
+          myText.value = json.addressLine1;
+        }
+        else {
+          const myText = document.getElementById("addresscheck");
+          myText.value = "No address found for this APN/ID";
+        }
+      } 
+      catch (error) {
+        console.log(error)
+        const myText = document.getElementById("addresscheck");
+        myText.value = "No address found for this APN/ID";
+      }
+
       if (isForSale) {
-        if (verAmount==0 || verStartdate=="" || verSellbydate=="" ||verSeller=="" || verRealtor=="" || salesPrice=="" || verSeller==verRealtor) {
+        if (myAPN=="" || verAmount==0 || verStartdate=="" || verSellbydate=="" ||verSeller=="" || verRealtor=="" || salesPrice=="") {
           setVerified(true);
         }
         else {
@@ -319,7 +353,7 @@ const MyForm = () => {
         }
       }
       else {
-        if (verAmount==0 || verStartdate=="" || verSellbydate=="" ||verSeller=="" || verRealtor=="" || verSeller==verRealtor) {
+        if (myAPN=="" || verAmount==0 || verStartdate=="" || verSellbydate=="" ||verSeller=="" || verRealtor=="" || verSeller==verRealtor) {
           setVerified(true);
         }
         else {
@@ -351,6 +385,15 @@ const MyForm = () => {
               >
                 <FontAwesomeIcon icon={faCircleInfo} style={{ color: "#ffffff", fontSize: '12px' }} className='m-2 py-0' />
               </button>
+            </section>
+
+            <section className="flex-start mb-6">
+              <textarea
+                id="addresscheck"
+                className="resize-none m-2 sm:w-96 h-15 px-4 py-4 text-white bg-gray-800 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-center max-w-screen-sm flex-grow"
+                disabled
+                placeholder="Address Will Display Here"
+              ></textarea>
             </section>
           
     
