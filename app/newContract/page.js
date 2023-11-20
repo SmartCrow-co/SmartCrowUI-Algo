@@ -154,9 +154,6 @@ const MyForm = () => {
 		  .catch((e) => console.log(e));
 	  }, []);
 
-	const searchParams = useSearchParams()
-  const SelAPN = searchParams.get('SelAPN');
-	const Address = searchParams.get('Address');
   const router = useRouter();
 
 	async function callBonus(account) {
@@ -207,7 +204,7 @@ const MyForm = () => {
     try {
       const results = await atc.execute(algodClient, 3);
       console.log(`Contract created ` + results.methodResults[0].returnValue);
-      setPopupHeaderSuccess('Contract Initiated! View transaction on https://testnet.algoexplorer.io/ Store this APN/ID safe to get status of existing contract ' + APN);
+      setPopupHeaderSuccess('Contract Initiated! View transaction on https://testnet.algoexplorer.io/  Store this APN/ID safe to get status of existing contract ' + APN);
       setShowPopupSuccess(true);
     }
     catch(e) {
@@ -268,6 +265,11 @@ const MyForm = () => {
 		setBalloonText('The amount entered is in Algos. For a conversion to USD, please visit https://www.coinbase.com/converter/algo/usd');
 		setShowBalloon(true);
 	  }
+
+    const handleClickBalloon1 = () => {
+      setBalloonText('This is your APN/ID which you can get by creating a new ID from https://developers.rentcast.io/reference/property-records-random');
+      setShowBalloon(true);
+      }
 
 	  const handleClickBalloon2 = () => {
 		setBalloonText('This is the start date of the contract.');
@@ -337,27 +339,18 @@ const MyForm = () => {
                 type="text"
                 id="parcelid"
                 className="m-2 bg-default-bg rounded px-3 py-2 focus:outline-offset-0 outline-sky-200 m-2 border APN_input max-w-screen-sm flex-grow"
-                defaultValue={SelAPN}
                 onChange={handleChange}
                 placeholder="APN/ID"
               />
               <button 
                 type="button" 
-                onClick={handleClickBalloon}
+                onClick={handleClickBalloon1}
                 className="info_btn m-2 about hover:bg-[#000000]/90 focus:outline-none focus:ring-[#000000]/50 inline-flex items-center hover:text-[#ffffff] dark:focus:ring-[#000000]/55"
               >
                 <FontAwesomeIcon icon={faCircleInfo} style={{ color: "#ffffff", fontSize: '12px' }} className='m-2 py-0' />
               </button>
             </section>
-            
-            <section className="flex-start m-2 mt-0">
-              <textarea
-                id="addresscheck"
-                className="ml-0 resize-none flex-grow max-w-screen-m h-15 px-4 py-4 text-white bg-gray-800 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-center"
-                disabled
-                defaultValue={Address}
-              ></textarea>
-            </section>
+          
     
             {/* Amount Algo */}
             <label htmlFor="bonusamount" className="font-bold mr-4 m-2 text-black">
