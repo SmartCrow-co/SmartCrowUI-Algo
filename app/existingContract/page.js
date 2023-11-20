@@ -426,7 +426,7 @@ const MyPage = () => {
       startdate = new Date(resultdate.getTime()+36000000);
       resultarray[4]=startdate;
       var startdate = resultarray[4].toLocaleString(undefined, {
-        month: "long",
+        month: "short",
         day: "numeric",
         year: "numeric",
       });
@@ -436,7 +436,7 @@ const MyPage = () => {
       sellbydate = new Date(resultdate2.getTime()+36000000);
       resultarray[5]=sellbydate;
       var sellbydate = resultarray[5].toLocaleString(undefined, {
-        month: "long",
+        month: "short",
         day: "numeric",
         year: "numeric",
       });
@@ -469,7 +469,7 @@ const MyPage = () => {
         <div className="flex flex-col gap-4">
           <div className='container flex flex-row'>
             <div className='left-side'>
-              <h2 className="text-black text-2xl font-bold">APN Address:</h2>
+              <h2 className="text-black text-2xl font-bold">APN/ID Address:</h2>
             </div>
             <div className='right-side ml-auto'>
               <button 

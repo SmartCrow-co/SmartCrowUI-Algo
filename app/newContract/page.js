@@ -207,7 +207,7 @@ const MyForm = () => {
     try {
       const results = await atc.execute(algodClient, 3);
       console.log(`Contract created ` + results.methodResults[0].returnValue);
-      setPopupHeaderSuccess('Contract Initiated! View transaction on https://testnet.algoexplorer.io/ Store this APN safe to get status of existing contract ' + APN);
+      setPopupHeaderSuccess('Contract Initiated! View transaction on https://testnet.algoexplorer.io/ Store this APN/ID safe to get status of existing contract ' + APN);
       setShowPopupSuccess(true);
     }
     catch(e) {
@@ -339,7 +339,7 @@ const MyForm = () => {
                 className="m-2 bg-default-bg rounded px-3 py-2 focus:outline-offset-0 outline-sky-200 m-2 border APN_input max-w-screen-sm flex-grow"
                 defaultValue={SelAPN}
                 onChange={handleChange}
-                placeholder="APN"
+                placeholder="APN/ID"
               />
               <button 
                 type="button" 

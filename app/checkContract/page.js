@@ -203,7 +203,7 @@ export default function Home() {
 				var startdate = new Date(resultdate.getTime()+36000000);
 				active[4]=startdate;
 				var startdate = active[4].toLocaleString(undefined, {
-					month: "long",
+					month: "short",
 					day: "numeric",
 					year: "numeric",
 				});
@@ -212,7 +212,7 @@ export default function Home() {
 				var sellbydate = new Date(resultdate2.getTime()+36000000);
 				active[5]=sellbydate;
 				var sellbydate = active[5].toLocaleString(undefined, {
-					month: "long",
+					month: "short",
 					day: "numeric",
 					year: "numeric",
 				});
@@ -241,7 +241,7 @@ export default function Home() {
 	}
 
 	const handleClickBalloon = () => {
-		setBalloonText('Check the address of the given APN. If there is no active contract on the given APN, you can create a new contract. If there is an active contract, you can check the details of the existing contract.');
+		setBalloonText('Check the address of the given APN/ID. If there is no active contract on the given APN/ID, you can create a new contract. If there is an active contract, you can check the details of the existing contract.');
 		setShowBalloon(true);
 	}
 
@@ -315,7 +315,7 @@ export default function Home() {
 			}
 		}
 		else {
-			setBalloonText('Please enter an APN');
+			setBalloonText('Please enter an APN/ID');
 			setShowBalloon(true);
 		}
 		
@@ -326,14 +326,14 @@ export default function Home() {
 		  <div className='mb-2 pb-20 container flex space-between flex-end'>
 			<div className='flex-col flex-start pt-4 pb-0 contract-left'>
 			  <section className="text-left mb-4">
-				<h1 className="text-xl font-bold m-2">Please Enter Your APN ID</h1>
+				<h1 className="text-xl font-bold m-2">Please Enter Your APN/ID</h1>
 			  </section>
 			  <section className="flex mb-8">
 				<input
 				  type="text"
 				  id="myAPNInput"
 				  className="w-60 bg-default-bg rounded px-3 py-2 focus:outline-offset-0 outline-sky-200 m-2 border APN_input"
-				  placeholder="Enter APN"
+				  placeholder="Enter APN/ID"
 				  required
 				/>
 				<button
