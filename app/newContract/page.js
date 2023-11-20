@@ -303,15 +303,8 @@ const MyForm = () => {
         setShowBalloon(false);
       };
 
-	  const handleChange = async() => {
+    const handleAPNChange = async() => {
       const myAPN = document.getElementById("parcelid").value;
-      const verAmount= document.getElementById("bonusamount").value;
-      const verStartdate= document.getElementById("startdate").value;
-      const verSellbydate= document.getElementById("sellbydate").value;
-      const verSeller = document.getElementById("senderwallet").value;
-      const verRealtor = document.getElementById("receiverwallet").value;
-      const salesPrice = document.getElementById("salesprice").value;
-
       const myText = document.getElementById("addresscheck");
       myText.value = "Loading...";
 
@@ -343,9 +336,19 @@ const MyForm = () => {
         const myText = document.getElementById("addresscheck");
         myText.value = "No address found for this APN/ID";
       }
+    }
+
+	  const handleChange = async() => {
+      const myAPN = document.getElementById("parcelid").value;
+      const verAmount= document.getElementById("bonusamount").value;
+      const verStartdate= document.getElementById("startdate").value;
+      const verSellbydate= document.getElementById("sellbydate").value;
+      const verSeller = document.getElementById("senderwallet").value;
+      const verRealtor = document.getElementById("receiverwallet").value;
+      const salesPrice = document.getElementById("salesprice").value;
 
       if (isForSale) {
-        if (myAPN=="" || verAmount==0 || verStartdate=="" || verSellbydate=="" ||verSeller=="" || verRealtor=="" || salesPrice=="") {
+        if (myAPN=="" || verAmount==0 || verStartdate=="" || verSellbydate=="" ||verSeller=="" || verRealtor=="" || salesPrice=="" || verSeller==verRealtor) {
           setVerified(true);
         }
         else {
@@ -375,7 +378,7 @@ const MyForm = () => {
                 type="text"
                 id="parcelid"
                 className="m-2 bg-default-bg rounded px-3 py-2 focus:outline-offset-0 outline-sky-200 m-2 border APN_input max-w-screen-sm flex-grow"
-                onChange={handleChange}
+                onChange={handleAPNChange}
                 placeholder="APN/ID"
               />
               <button 

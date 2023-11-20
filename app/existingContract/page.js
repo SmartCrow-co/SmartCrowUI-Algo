@@ -261,7 +261,7 @@ const MyPage = () => {
     }
     catch(e) {
       console.log(e)
-      setPopupHeader("Withdrawal Failed. Reasons: Your are not the contract owner or this contract is not active.");
+      setPopupHeader("Withdrawal Failed.");
       setShowPopup(true);
       setFetch(false)
     }
@@ -306,7 +306,7 @@ const MyPage = () => {
     }
     catch(e) {
       console.log(e)
-      setPopupHeader("Withdrawal Failed. Reasons: Your are not the contract owner or this contract is not active.");
+      setPopupHeader("Withdrawal Failed.");
       setShowPopup(true);
       setFetch(false)
     }
