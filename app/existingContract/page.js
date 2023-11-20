@@ -522,12 +522,12 @@ const MyPage = () => {
               <button className="bg-white border border-sky-200 hover:bg-gray-200 text-white font-semibold py-3 px-6 rounded-lg mb-4" onClick={handleWithdrawSeller}>
                 <img src='/assets/images/send.png' className='h-10 w-10' alt="Send" />
               </button>
-              <p className="text-default-text">Withdraw as <span><p>Sender</p></span></p>
+              <p className="text-default-text">Withdraw as Sender</p>
             </div>
   
             {fetching && (
               <div className="w-full sm:w-1/2 text-center mr-10">
-                <p className="text-default-text">Fetching...</p>
+                <p className="text-default-text">Fetching updated data from the contract, waiting for Contract Owner to make updates. This could take several minutes. Please be patient...</p>
               </div>
             )}
   
@@ -535,7 +535,7 @@ const MyPage = () => {
               <button className="bg-white border border-sky-200 hover:bg-gray-200 text-white font-semibold py-3 px-6 rounded-lg mb-4" onClick={handleWithdrawRealtor}>
                 <img src='/assets/images/receive.png' className='h-10 w-10' alt="Receive" />
               </button>
-              <p className="text-default-text">Withdraw as <span><p>Receiver</p></span></p>
+              <p className="text-default-text">Withdraw as Receiver</p>
             </div>
           </div>
         </div>
