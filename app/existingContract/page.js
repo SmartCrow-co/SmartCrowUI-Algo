@@ -322,7 +322,7 @@ const MyPage = () => {
       console.log('Response:', response.data);
       if (response.data["meetSalesCondition"].condition == false && response.data["postDeadlineCheck"] == true) {
         await withdrawSenderPera(APN, accountAddress)
-        setPopupHeaderSuccess('Withdrawal Initiated. ' + response.data["meetSalesCondition"].reason);
+        setPopupHeaderSuccess('Withdrawal Initiated. View transaction on https://testnet.algoexplorer.io/ ' + response.data["meetSalesCondition"].reason);
         setShowPopupSuccess(true);
         setFetch(false)
         setActiveFlag("NO")
@@ -364,7 +364,7 @@ const MyPage = () => {
       console.log('Response:', response.data);
       if (response.data["meetSalesCondition"].condition) {
         await withdrawReceiverPera(APN, accountAddress)
-        setPopupHeaderSuccess('Withdrawal Initiated. ' + response.data["meetSalesCondition"].reason);
+        setPopupHeaderSuccess('Withdrawal Initiated. View transaction on https://testnet.algoexplorer.io/ ' + response.data["meetSalesCondition"].reason);
         setShowPopupSuccess(true);
         setFetch(false)
         setActiveFlag("NO")

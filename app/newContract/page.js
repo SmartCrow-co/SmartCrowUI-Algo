@@ -207,7 +207,7 @@ const MyForm = () => {
     try {
       const results = await atc.execute(algodClient, 3);
       console.log(`Contract created ` + results.methodResults[0].returnValue);
-      setPopupHeaderSuccess('Contract Initiated!');
+      setPopupHeaderSuccess('Contract Initiated! View transaction on https://testnet.algoexplorer.io/ Store this APN safe to get status of existing contract ' + APN);
       setShowPopupSuccess(true);
     }
     catch(e) {
