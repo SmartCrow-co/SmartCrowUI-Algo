@@ -204,11 +204,13 @@ const MyForm = () => {
     try {
       const results = await atc.execute(algodClient, 3);
       console.log(`Contract created ` + results.methodResults[0].returnValue);
-      setPopupHeaderSuccess('Contract Initiated! View transaction on https://testnet.algoexplorer.io/  Store this APN/ID safe to get status of existing contract ' + APN);
+      setPopupHeaderSuccess('Contract Initiated! View transaction on https://testnet.algoexplorer.io/. Store this APN/ID safe to get status of existing contract ' + APN);
       setShowPopupSuccess(true);
     }
     catch(e) {
       console.log(e)
+      setPopupHeader('Contract Creation Failed');
+      setShowPopup(true);
     }
 	}
 
@@ -462,7 +464,7 @@ const MyForm = () => {
     
             {/* Sales Price */}
             <label htmlFor="bonusamount" className="font-bold mt-4 m-2 text-black">
-              Sales Price greater than equals to:
+              Sales Price $ ≥
             </label>
             <section className="flex mb-8">
               <input

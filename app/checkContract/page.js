@@ -131,6 +131,7 @@ export default function Home() {
 	const [balloonText,setBalloonText] = useState("");
 	const [buttonExistingContract,setbuttonExistingContract] = useState(true);
   	const router = useRouter();
+	const [fetching, setFetch] = useState(false);
 
 	useEffect(() => {
 		// Reconnect to the session when the component is mounted
@@ -196,42 +197,41 @@ export default function Home() {
 				const seller = active[1]
 				const realtor = active[2]
 				const amount = Number(active[3]) / 1e6;
+				console.log(active[10])
+				setFetch(false)
+				var resultdate = new Date(Number(active[4])*1000);
+				var startdate = new Date(resultdate.getTime()+36000000);
+				active[4]=startdate;
+				var startdate = active[4].toLocaleString(undefined, {
+					month: "short",
+					day: "numeric",
+					year: "numeric",
+				});
 
-				if (active[10]) {
-					var resultdate = new Date(Number(active[4])*1000);
-					var startdate = new Date(resultdate.getTime()+36000000);
-					active[4]=startdate;
-					var startdate = active[4].toLocaleString(undefined, {
-						month: "short",
-						day: "numeric",
-						year: "numeric",
-					});
+				var resultdate2 = new Date(Number(active[5])*1000);
+				var sellbydate = new Date(resultdate2.getTime()+36000000);
+				active[5]=sellbydate;
+				var sellbydate = active[5].toLocaleString(undefined, {
+					month: "short",
+					day: "numeric",
+					year: "numeric",
+				});
 
-					var resultdate2 = new Date(Number(active[5])*1000);
-					var sellbydate = new Date(resultdate2.getTime()+36000000);
-					active[5]=sellbydate;
-					var sellbydate = active[5].toLocaleString(undefined, {
-						month: "short",
-						day: "numeric",
-						year: "numeric",
-					});
-
-					var salesPrice = active[8];
-					var activeflag = active[10];
-					if (activeflag){
-						localStorage.setItem("active", "NO")
-					}
-					else {
-						localStorage.setItem("active", "YES")
-					}
-
-					localStorage.setItem("algos", amount)
-					localStorage.setItem("seller", seller)
-					localStorage.setItem("receiver", realtor)
-					localStorage.setItem("startdate", startdate)
-					localStorage.setItem("enddate", sellbydate)
-					localStorage.setItem("salesprice", Number(salesPrice))
+				var salesPrice = active[8];
+				var activeflag = active[10];
+				if (activeflag){
+					localStorage.setItem("active", "NO")
 				}
+				else {
+					localStorage.setItem("active", "YES")
+				}
+
+				localStorage.setItem("algos", amount)
+				localStorage.setItem("seller", seller)
+				localStorage.setItem("receiver", realtor)
+				localStorage.setItem("startdate", startdate)
+				localStorage.setItem("enddate", sellbydate)
+				localStorage.setItem("salesprice", Number(salesPrice))
 		} catch (e) {
 			console.log(e);
 		}
@@ -276,6 +276,7 @@ export default function Home() {
 		var myAPN = document.getElementById("myAPNInput").value;
 		dotenv.config()
 		const API_KEY = process.env.NEXT_PUBLIC_API_KEY
+		setFetch(true)
 		if (myAPN != "") {
 			const url = `https://api.rentcast.io/v1/properties/${encodeURIComponent(myAPN)}`;
 
@@ -304,9 +305,11 @@ export default function Home() {
 				setBalloonText('No property found for the given ID. You can check if the property exists in https://developers.rentcast.io/reference/property-record-by-id');
 				setShowBalloon(true);
 				console.log('No property found for the given ID. ');
+				setFetch(false)
 			}
 			} catch (error) {
 				console.log('Error fetching property information: ' + error.message);
+				setFetch(false)
 			}
 		}
 		else {
@@ -347,6 +350,12 @@ export default function Home() {
 				  <FontAwesomeIcon icon={faCircleInfo} style={{ color: "#ffffff", fontSize: '12px' }} className='m-2 py-0' />
 				</button>
 			  </section>
+
+			  {fetching && (
+				<div className="w-full sm:w-3/4 text-center mr-10">
+					<h1 className="text-s text-default-text"> Fetching address... This may take a few seconds</h1>
+				</div>
+				)}
 	  
 			  <section className="flex-start mb-6 mt-0 w-120">
 				<textarea

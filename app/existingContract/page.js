@@ -168,86 +168,6 @@ async function callContract(APN, account) {
   }
 }
 
-async function withdrawSenderPera(APN, account) {
-	const algodToken = '';
-	const algodServer = 'https://testnet-api.algonode.cloud';
-	const algodPort = undefined;
-	const algodClient = new algosdk.Algodv2(algodToken, algodServer, algodPort);
-
-	const suggestedParams = await algodClient.getTransactionParams().do();
-  console.log('suggestedParams:', suggestedParams);
-
-	const contract = new algosdk.ABIContract(myabi);
-	const atc = new algosdk.AtomicTransactionComposer();
-
-	atc.addMethodCall({
-		appID: 469360340,
-		method: algosdk.getMethodByName(contract.methods, 'WithdrawFundsForSender'),
-		sender: account,
-		suggestedParams,
-		signer: async (unsignedTxns) => {
-			const txnGroups = unsignedTxns.map((t) => ({txn: t, signers: [t.from]}));
-			return await peraWallet.signTransaction([txnGroups]);
-		},
-		methodArgs: [APN],
-		boxes: [
-			{
-				appIndex: 469360340,
-				name: new Uint8Array(Buffer.from(APN))
-			}
-		],
-	});
-
-	try {
-    const results = await atc.execute(algodClient, 3);
-    const resultsArray = results.methodResults[0].returnValue
-    console.log(`Contract read success ` + results.methodResults[0].returnValue);
-
-    return resultsArray
-  }
-  catch(e) {
-    console.log(e)
-  }
-}
-
-async function withdrawReceiverPera(APN, account) {
-	const algodToken = '';
-	const algodServer = 'https://testnet-api.algonode.cloud';
-	const algodPort = undefined;
-	const algodClient = new algosdk.Algodv2(algodToken, algodServer, algodPort);
-	const suggestedParams = await algodClient.getTransactionParams().do();
-  console.log('suggestedParams:', suggestedParams);
-	const contract = new algosdk.ABIContract(myabi);
-	const atc = new algosdk.AtomicTransactionComposer();
-
-	atc.addMethodCall({
-		appID: 469360340,
-		method: algosdk.getMethodByName(contract.methods, 'WithdrawFundsForReceiver'),
-		sender: account,
-		suggestedParams,
-		signer: async (unsignedTxns) => {
-			const txnGroups = unsignedTxns.map((t) => ({txn: t, signers: [t.from]}));
-			return await peraWallet.signTransaction([txnGroups]);
-		},
-		methodArgs: [APN], 
-		boxes: [
-			{
-				appIndex: 469360340,
-				name: new Uint8Array(Buffer.from(APN))
-			}
-		],
-	});
-
-  try {
-    const results = await atc.execute(algodClient, 3);
-    const resultsArray = results.methodResults[0].returnValue
-    console.log(`Contract read success ` + results.methodResults[0].returnValue);
-    return resultsArray
-  }
-  catch(e) {
-    console.log(e)
-  }
-}
 
 
 const formatLongString = (str) => {
@@ -299,6 +219,98 @@ const MyPage = () => {
 			})
 			.catch((e) => console.log(e));
 	}, []);
+
+  async function withdrawSenderPera(APN, account, reason) {
+    const algodToken = '';
+    const algodServer = 'https://testnet-api.algonode.cloud';
+    const algodPort = undefined;
+    const algodClient = new algosdk.Algodv2(algodToken, algodServer, algodPort);
+  
+    const suggestedParams = await algodClient.getTransactionParams().do();
+    console.log('suggestedParams:', suggestedParams);
+  
+    const contract = new algosdk.ABIContract(myabi);
+    const atc = new algosdk.AtomicTransactionComposer();
+  
+    atc.addMethodCall({
+      appID: 469360340,
+      method: algosdk.getMethodByName(contract.methods, 'WithdrawFundsForSender'),
+      sender: account,
+      suggestedParams,
+      signer: async (unsignedTxns) => {
+        const txnGroups = unsignedTxns.map((t) => ({txn: t, signers: [t.from]}));
+        return await peraWallet.signTransaction([txnGroups]);
+      },
+      methodArgs: [APN],
+      boxes: [
+        {
+          appIndex: 469360340,
+          name: new Uint8Array(Buffer.from(APN))
+        }
+      ],
+    });
+  
+    try {
+      const results = await atc.execute(algodClient, 3);
+      const resultsArray = results.methodResults[0].returnValue
+      console.log(`Contract read success ` + results.methodResults[0].returnValue);
+      setPopupHeaderSuccess('Withdrawal Initiated. ' + reason + ". View transaction on https://testnet.algoexplorer.io/");
+      setShowPopupSuccess(true);
+      setFetch(false)
+      setActiveFlag("NO")
+    }
+    catch(e) {
+      console.log(e)
+      setPopupHeader("Withdrawal Failed. Reasons: Your are not the contract owner or this contract is not active.");
+      setShowPopup(true);
+      setFetch(false)
+    }
+  }
+  
+  async function withdrawReceiverPera(APN, account, reason) {
+    const algodToken = '';
+    const algodServer = 'https://testnet-api.algonode.cloud';
+    const algodPort = undefined;
+    const algodClient = new algosdk.Algodv2(algodToken, algodServer, algodPort);
+    const suggestedParams = await algodClient.getTransactionParams().do();
+    console.log('suggestedParams:', suggestedParams);
+    const contract = new algosdk.ABIContract(myabi);
+    const atc = new algosdk.AtomicTransactionComposer();
+  
+    atc.addMethodCall({
+      appID: 469360340,
+      method: algosdk.getMethodByName(contract.methods, 'WithdrawFundsForReceiver'),
+      sender: account,
+      suggestedParams,
+      signer: async (unsignedTxns) => {
+        const txnGroups = unsignedTxns.map((t) => ({txn: t, signers: [t.from]}));
+        return await peraWallet.signTransaction([txnGroups]);
+      },
+      methodArgs: [APN], 
+      boxes: [
+        {
+          appIndex: 469360340,
+          name: new Uint8Array(Buffer.from(APN))
+        }
+      ],
+    });
+  
+    try {
+      const results = await atc.execute(algodClient, 3);
+      const resultsArray = results.methodResults[0].returnValue
+      console.log(`Contract read success ` + results.methodResults[0].returnValue);
+      setPopupHeaderSuccess('Withdrawal Initiated. ' + response.data["meetSalesCondition"].reason + ". View transaction on https://testnet.algoexplorer.io/");
+      setShowPopupSuccess(true);
+      setFetch(false)
+      setActiveFlag("NO")
+    }
+    catch(e) {
+      console.log(e)
+      setPopupHeader("Withdrawal Failed. Reasons: Your are not the contract owner or this contract is not active.");
+      setShowPopup(true);
+      setFetch(false)
+    }
+  }
 	
 
   async function updateContractInfoSeller(appID, APN){
@@ -321,11 +333,7 @@ const MyPage = () => {
       // Handle the successful response
       console.log('Response:', response.data);
       if (response.data["meetSalesCondition"].condition == false && response.data["postDeadlineCheck"] == true) {
-        await withdrawSenderPera(APN, accountAddress)
-        setPopupHeaderSuccess('Withdrawal Initiated. View transaction on https://testnet.algoexplorer.io/ ' + response.data["meetSalesCondition"].reason);
-        setShowPopupSuccess(true);
-        setFetch(false)
-        setActiveFlag("NO")
+        await withdrawSenderPera(APN, accountAddress, response.data["meetSalesCondition"].reason)
       }
       else {
         setPopupHeader('Unable to withdraw');
@@ -363,11 +371,7 @@ const MyPage = () => {
       // Handle the successful response
       console.log('Response:', response.data);
       if (response.data["meetSalesCondition"].condition) {
-        await withdrawReceiverPera(APN, accountAddress)
-        setPopupHeaderSuccess('Withdrawal Initiated. View transaction on https://testnet.algoexplorer.io/ ' + response.data["meetSalesCondition"].reason);
-        setShowPopupSuccess(true);
-        setFetch(false)
-        setActiveFlag("NO")
+        await withdrawReceiverPera(APN, accountAddress, response.data["meetSalesCondition"].reason)
       }
       else {
         setPopupHeader('Unable to withdraw');
@@ -495,7 +499,7 @@ const MyPage = () => {
             <div className="flex rounded px-2 py-2">
               <div className="w-2/3">
                 <ul className="list-inside text-black">
-                  <li>Amount <span className='text-default-text'>(Algos)</span>:</li>
+                  <li>Amount <span className='text-default-text'>(ALGO)</span>:</li>
                   <li>Start date:</li>
                   <li>Sold by:</li>
                   <li>Sender Wallet:</li>
@@ -527,7 +531,7 @@ const MyPage = () => {
   
             {fetching && (
               <div className="w-full sm:w-1/2 text-center mr-10">
-                <p className="text-default-text">Fetching updated data from the contract, waiting for Contract Owner to make updates. This could take several minutes. Please be patient...</p>
+                <p className="text-default-text">Fetching updated data from the contract, waiting for contract owner to make updates. This could take several minutes. Please be patient...</p>
               </div>
             )}
   
